@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.matheusandrade.springboot_mongodb_project.domain.Post;
 import com.matheusandrade.springboot_mongodb_project.domain.User;
 import com.matheusandrade.springboot_mongodb_project.dto.UserDTO;
 import com.matheusandrade.springboot_mongodb_project.services.UserService;
@@ -32,7 +33,6 @@ public class UserResource {
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
-        
         List<User> list = service.findAll();
         List<UserDTO> listDto = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
         return ResponseEntity.ok().body(listDto);
@@ -40,14 +40,12 @@ public class UserResource {
 
     @GetMapping(value="/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable String id) {
-
         User obj = service.findById(id);
         return ResponseEntity.ok().body(new UserDTO(obj));
     }
 
     @PostMapping
     public ResponseEntity<Void> insert(@RequestBody UserDTO objDTO) {
-
         User obj = service.fromDTO(objDTO);
         obj = service.insert(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
@@ -56,17 +54,21 @@ public class UserResource {
 
     @DeleteMapping(value="/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id) {
-
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value="/{id}")
     public ResponseEntity<Void> update(@RequestBody UserDTO objDTO, @PathVariable String id) {
-
         User obj = service.fromDTO(objDTO);
         obj.setId(id);
         obj = service.update(obj);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value="/{id}/posts")
+    public ResponseEntity<List<Post>> findPosts(@PathVariable String id) {
+        User obj = service.findById(id);
+        return ResponseEntity.ok().body(obj.getPosts());
     }
 }

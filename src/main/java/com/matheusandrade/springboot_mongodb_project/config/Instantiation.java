@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.matheusandrade.springboot_mongodb_project.domain.Post;
 import com.matheusandrade.springboot_mongodb_project.domain.User;
+import com.matheusandrade.springboot_mongodb_project.dto.AuthorDTO;
 import com.matheusandrade.springboot_mongodb_project.repository.PostRepository;
 import com.matheusandrade.springboot_mongodb_project.repository.UserRepository;
 
@@ -37,12 +38,19 @@ public class Instantiation implements CommandLineRunner {
         User u3 = new User(null, "Legolas", "legolas@gmail.com");
         User u4 = new User(null, "Gimli", "gimli@gmail.com");
 
-        Post post1 = new Post(null, sdf.parse("09/03/2024"), "Look to my coming", "Look to my coming at first light on the fifth day. At dawn, look to the East.", u2);
-        Post post2 = new Post(null, sdf.parse("09/03/2024"), "These are no soldiers", "Look at them. They're frightened. I can see it in their eyes.", u3);
-
         userReposiroty.saveAll(Arrays.asList(u1, u2, u3, u4));
-        postRepository.saveAll(Arrays.asList(post1, post2));
 
+        Post post1 = new Post(null, sdf.parse("09/03/2024"), "Look to my coming", "Look to my coming at first light on the fifth day. At dawn, look to the East.", new AuthorDTO(u2));
+        Post post2 = new Post(null, sdf.parse("09/04/2024"), "These are no soldiers", "Most have seen too many winters!",  new AuthorDTO(u4));
+        Post post3 = new Post(null, sdf.parse("09/04/2024"), "Dwarves and elves", "Never thought I’d die fighting side by side with an elf.",  new AuthorDTO(u4));
+
+        postRepository.saveAll(Arrays.asList(post1, post2, post3));
+
+        u2.getPosts().addAll(Arrays.asList(post1));
+        u4.getPosts().addAll(Arrays.asList(post2, post3));
+
+        userReposiroty.save(u2);
+        userReposiroty.save(u4);
     }
 
 }
